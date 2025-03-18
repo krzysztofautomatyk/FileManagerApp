@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>111.ico</ApplicationIcon>
+    <PackageIcon>111.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="111.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Users\kwoznicz\Downloads\111.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
