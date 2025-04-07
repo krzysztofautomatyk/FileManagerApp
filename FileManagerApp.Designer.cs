@@ -40,7 +40,7 @@
             // listBoxFiles
             // 
             listBoxFiles.AllowDrop = true;
-            listBoxFiles.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            listBoxFiles.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             listBoxFiles.FormattingEnabled = true;
             listBoxFiles.Location = new Point(12, 74);
             listBoxFiles.Name = "listBoxFiles";
@@ -98,6 +98,7 @@
             btnClipboard.TabIndex = 5;
             btnClipboard.Text = "Copy to Clipboard";
             btnClipboard.UseVisualStyleBackColor = true;
+            btnClipboard.Click += btnClipboard_Click_1;
             // 
             // FileManagerApp
             // 
@@ -110,7 +111,7 @@
             Controls.Add(btnAddDir);
             Controls.Add(btnAddFile);
             Controls.Add(listBoxFiles);
-            Icon = (Icon)resources.GetObject("$this.Icon");
+            
             Name = "FileManagerApp";
             Text = "FileManagerApp";
             TopMost = true;
