@@ -137,8 +137,22 @@ namespace FileManagerApp
 
         private void BtnGenerate_Click(object sender, EventArgs e)
         {
-            if (files.Count == 0) { /* ... (bez zmian) ... */ return; }
-            using (SaveFileDialog sfd = new SaveFileDialog()) { /* ... (bez zmian) ... */ }
+            if (files.Count == 0)
+            {
+                MessageBox.Show("Brak plików do zapisania.", "Informacja", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            using (SaveFileDialog sfd = new SaveFileDialog())
+            {
+                sfd.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                sfd.Title = "Zapisz plik wynikowy";
+                sfd.DefaultExt = "txt";
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    GenerateTextFile(sfd.FileName);
+                    MessageBox.Show($"Plik został zapisany: {sfd.FileName}", "Sukces", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
         }
 
         private void BtnClipboard_Click(object sender, EventArgs e)
@@ -240,7 +254,8 @@ namespace FileManagerApp
                 "bin",
                 "obj",
                 ".github",  // Dodano
-                "Migrations" // Dodano
+                "Migrations", // Dodano
+                "wwwroot" // Dodano
             };
 
             // Sprawdź, czy sama ścieżka jest jednym z ignorowanych katalogów
