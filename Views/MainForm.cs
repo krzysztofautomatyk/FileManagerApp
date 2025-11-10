@@ -1,11 +1,13 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 using FileManagerApp.Core;
 using FileManagerApp.Models;
 using FileManagerApp.ViewModels;
+using FileManagerApp.Controls;
 
 namespace FileManagerApp
 {
@@ -13,35 +15,40 @@ namespace FileManagerApp
     {
         private readonly MainViewModel _viewModel;
 
-        // UI Controls
-        private ToolStrip toolStrip = null!;
-        private ToolStripButton btnAddFile = null!;
-        private ToolStripButton btnAddDir = null!;
-        private ToolStripButton btnClear = null!;
-        private ToolStripButton btnGenerate = null!;
-        private ToolStripButton btnClipboard = null!;
-        private ToolStripButton btnCancel = null!;
+        // Modern UI Controls
+        private Panel topBar = null!;
+        private Label lblTitle = null!;
+        private ModernButton btnMinimize = null!;
+        private ModernButton btnMaximize = null!;
+        private ModernButton btnClose = null!;
 
-        private StatusStrip statusStrip = null!;
-        private ToolStripStatusLabel lblStatus = null!;
-        private ToolStripProgressBar progressBar = null!;
-        private ToolStripStatusLabel lblStats = null!;
+        private Panel actionBar = null!;
+        private ModernButton btnAddFile = null!;
+        private ModernButton btnAddDir = null!;
+        private ModernButton btnClear = null!;
+        private ModernButton btnGenerate = null!;
+        private ModernButton btnClipboard = null!;
+        private ModernButton btnCancel = null!;
 
-        private SplitContainer mainSplitContainer = null!;
-        private SplitContainer leftSplitContainer = null!;
+        private ModernTextBox txtSearch = null!;
 
-        private Panel searchPanel = null!;
-        private TextBox txtSearch = null!;
-        private Label lblSearch = null!;
+        private ModernPanel mainContainer = null!;
+        private ModernPanel filesPanel = null!;
+        private ModernPanel previewPanel = null!;
+        private ModernPanel statsPanel = null!;
 
-        private ListBox listBoxFiles = null!;
+        private ModernListView listViewFiles = null!;
         private TextBox txtPreview = null!;
-        private Panel statsPanel = null!;
+
         private Label lblStatsTitle = null!;
         private Label lblTotalFiles = null!;
         private Label lblTotalSize = null!;
         private Label lblTextFiles = null!;
         private Label lblBinaryFiles = null!;
+
+        private Panel statusBar = null!;
+        private Label lblStatus = null!;
+        private ProgressBar progressBar = null!;
 
         public MainForm()
         {
@@ -53,210 +60,280 @@ namespace FileManagerApp
 
         private void InitializeComponent()
         {
-            this.Text = "File Manager Pro";
-            this.Size = new Size(1400, 900);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.MinimumSize = new Size(1000, 600);
-            this.BackColor = Color.FromArgb(240, 240, 240);
+            // Form settings
+            Text = "File Manager Pro";
+            Size = new Size(1400, 900);
+            StartPosition = FormStartPosition.CenterScreen;
+            MinimumSize = new Size(1200, 700);
+            FormBorderStyle = FormBorderStyle.None;
+            BackColor = ModernTheme.BackgroundLight;
+            DoubleBuffered = true;
 
-            // Create ToolStrip
-            toolStrip = new ToolStrip
-            {
-                ImageScalingSize = new Size(24, 24),
-                GripStyle = ToolStripGripStyle.Hidden,
-                BackColor = Color.FromArgb(45, 45, 48),
-                ForeColor = Color.White,
-                Padding = new Padding(10, 5, 10, 5)
-            };
-
-            btnAddFile = CreateToolStripButton("Add Files", "Add individual files");
-            btnAddDir = CreateToolStripButton("Add Directory", "Scan and add directory");
-            toolStrip.Items.Add(new ToolStripSeparator());
-            btnClear = CreateToolStripButton("Clear", "Clear all files");
-            toolStrip.Items.Add(new ToolStripSeparator());
-            btnGenerate = CreateToolStripButton("Generate File", "Export to text file");
-            btnClipboard = CreateToolStripButton("Copy to Clipboard", "Copy combined content");
-            toolStrip.Items.Add(new ToolStripSeparator());
-            btnCancel = CreateToolStripButton("Cancel", "Cancel current operation");
-            btnCancel.Enabled = false;
-
-            // Create StatusStrip
-            statusStrip = new StatusStrip
-            {
-                BackColor = Color.FromArgb(0, 122, 204),
-                ForeColor = Color.White
-            };
-
-            lblStatus = new ToolStripStatusLabel
-            {
-                Text = "Ready",
-                Spring = true,
-                TextAlign = ContentAlignment.MiddleLeft,
-                ForeColor = Color.White
-            };
-
-            progressBar = new ToolStripProgressBar
-            {
-                Size = new Size(200, 20),
-                Style = ProgressBarStyle.Continuous,
-                Visible = false
-            };
-
-            lblStats = new ToolStripStatusLabel
-            {
-                Text = "Files: 0",
-                ForeColor = Color.White
-            };
-
-            statusStrip.Items.AddRange(new ToolStripItem[] { lblStatus, progressBar, lblStats });
-
-            // Create main split container (Left: Files & Stats | Right: Preview)
-            mainSplitContainer = new SplitContainer
-            {
-                Dock = DockStyle.Fill,
-                Orientation = Orientation.Vertical,
-                SplitterDistance = 700,
-                BorderStyle = BorderStyle.FixedSingle
-            };
-
-            // Create left split container (Top: Files | Bottom: Stats)
-            leftSplitContainer = new SplitContainer
-            {
-                Dock = DockStyle.Fill,
-                Orientation = Orientation.Horizontal,
-                SplitterDistance = 500,
-                BorderStyle = BorderStyle.None
-            };
-
-            // Search Panel
-            searchPanel = new Panel
+            // Top Bar (Custom Title Bar)
+            topBar = new Panel
             {
                 Dock = DockStyle.Top,
                 Height = 50,
-                BackColor = Color.White,
-                Padding = new Padding(10)
+                BackColor = Color.White
             };
+            topBar.Paint += TopBar_Paint;
 
-            lblSearch = new Label
+            lblTitle = new Label
             {
-                Text = "Search:",
-                Location = new Point(10, 15),
+                Text = "📁 File Manager Pro",
+                Location = new Point(20, 12),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold)
+                Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                ForeColor = ModernTheme.TextDark
             };
 
-            txtSearch = new TextBox
-            {
-                Location = new Point(80, 12),
-                Width = 500,
-                Font = new Font("Segoe UI", 10F),
-                PlaceholderText = "Search files by name, path, or extension..."
-            };
+            // Window control buttons
+            btnClose = CreateWindowButton("×", ModernTheme.AccentRed);
+            btnClose.Location = new Point(topBar.Width - 50, 10);
+            btnClose.Size = new Size(40, 30);
+            btnClose.Click += (s, e) => Close();
 
-            searchPanel.Controls.AddRange(new Control[] { lblSearch, txtSearch });
+            btnMaximize = CreateWindowButton("□", ModernTheme.TextMedium);
+            btnMaximize.Location = new Point(topBar.Width - 95, 10);
+            btnMaximize.Size = new Size(40, 30);
+            btnMaximize.Click += (s, e) => WindowState = WindowState == FormWindowState.Maximized ? FormWindowState.Normal : FormWindowState.Maximized;
 
-            // File ListBox
-            listBoxFiles = new ListBox
+            btnMinimize = CreateWindowButton("─", ModernTheme.TextMedium);
+            btnMinimize.Location = new Point(topBar.Width - 140, 10);
+            btnMinimize.Size = new Size(40, 30);
+            btnMinimize.Click += (s, e) => WindowState = FormWindowState.Minimized;
+
+            topBar.Controls.AddRange(new Control[] { lblTitle, btnClose, btnMaximize, btnMinimize });
+
+            // Enable window dragging
+            topBar.MouseDown += TopBar_MouseDown;
+            topBar.MouseMove += TopBar_MouseMove;
+            topBar.MouseUp += TopBar_MouseUp;
+            lblTitle.MouseDown += TopBar_MouseDown;
+            lblTitle.MouseMove += TopBar_MouseMove;
+            lblTitle.MouseUp += TopBar_MouseUp;
+
+            // Action Bar
+            actionBar = new Panel
             {
-                Dock = DockStyle.Fill,
-                Font = new Font("Consolas", 9F),
+                Dock = DockStyle.Top,
+                Height = 80,
                 BackColor = Color.White,
-                BorderStyle = BorderStyle.None,
-                IntegralHeight = false,
-                AllowDrop = true
+                Padding = new Padding(20, 10, 20, 10)
+            };
+            actionBar.Paint += (s, e) =>
+            {
+                e.Graphics.DrawLine(new Pen(ModernTheme.BorderLight, 1), 0, actionBar.Height - 1, actionBar.Width, actionBar.Height - 1);
             };
 
-            var filesPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                Padding = new Padding(10)
-            };
-            filesPanel.Controls.Add(listBoxFiles);
+            int buttonX = 20;
+            btnAddFile = CreateActionButton("➕ Add Files", ModernTheme.PrimaryColor, buttonX);
+            buttonX += 140;
+            btnAddDir = CreateActionButton("📁 Add Directory", ModernTheme.AccentGreen, buttonX);
+            buttonX += 160;
+            btnClear = CreateActionButton("🗑️ Clear", ModernTheme.TextMedium, buttonX);
+            buttonX += 120;
+            btnGenerate = CreateActionButton("💾 Generate", ModernTheme.AccentPurple, buttonX);
+            buttonX += 140;
+            btnClipboard = CreateActionButton("📋 Copy", ModernTheme.AccentOrange, buttonX);
+            buttonX += 120;
+            btnCancel = CreateActionButton("⛔ Cancel", ModernTheme.AccentRed, buttonX);
+            btnCancel.Enabled = false;
 
-            leftSplitContainer.Panel1.Controls.Add(filesPanel);
-            leftSplitContainer.Panel1.Controls.Add(searchPanel);
-
-            // Stats Panel
-            statsPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(250, 250, 250),
-                Padding = new Padding(15)
-            };
-
-            lblStatsTitle = new Label
-            {
-                Text = "Statistics",
-                Location = new Point(15, 15),
-                AutoSize = true,
-                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(45, 45, 48)
-            };
-
-            lblTotalFiles = CreateStatsLabel("Total Files: 0", 50);
-            lblTotalSize = CreateStatsLabel("Total Size: 0 B", 80);
-            lblTextFiles = CreateStatsLabel("Text Files: 0", 110);
-            lblBinaryFiles = CreateStatsLabel("Binary Files: 0", 140);
-
-            statsPanel.Controls.AddRange(new Control[]
-            {
-                lblStatsTitle, lblTotalFiles, lblTotalSize, lblTextFiles, lblBinaryFiles
+            actionBar.Controls.AddRange(new Control[] {
+                btnAddFile, btnAddDir, btnClear, btnGenerate, btnClipboard, btnCancel
             });
 
-            leftSplitContainer.Panel2.Controls.Add(statsPanel);
+            // Search Box
+            txtSearch = new ModernTextBox
+            {
+                Location = new Point(20, 45),
+                Width = 400,
+                PlaceholderText = "Search files by name, path, or extension...",
+                Icon = "🔍"
+            };
+            actionBar.Controls.Add(txtSearch);
 
-            // Preview Panel
-            var previewPanel = new Panel
+            // Main Container
+            mainContainer = new ModernPanel
             {
                 Dock = DockStyle.Fill,
-                Padding = new Padding(10)
+                Padding = new Padding(20),
+                ShowShadow = false,
+                UseGradient = false,
+                GradientStart = ModernTheme.BackgroundLight,
+                BorderColor = Color.Transparent,
+                BorderWidth = 0
             };
 
-            var lblPreview = new Label
+            // Files Panel (Left)
+            filesPanel = new ModernPanel
             {
-                Text = "File Preview",
-                Dock = DockStyle.Top,
-                Height = 30,
-                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-                TextAlign = ContentAlignment.MiddleLeft,
-                BackColor = Color.FromArgb(230, 230, 230),
-                Padding = new Padding(10, 5, 10, 5)
+                Location = new Point(20, 20),
+                Size = new Size(700, 600),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left
+            };
+
+            Label lblFilesTitle = new Label
+            {
+                Text = "📂 Files",
+                Location = new Point(15, 15),
+                AutoSize = true,
+                Font = ModernTheme.SubheadingFont,
+                ForeColor = ModernTheme.TextDark
+            };
+
+            listViewFiles = new ModernListView
+            {
+                Location = new Point(15, 50),
+                Size = new Size(670, 535),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
+            };
+            listViewFiles.AllowDrop = true;
+            listViewFiles.DragEnter += ListViewFiles_DragEnter;
+            listViewFiles.DragDrop += ListViewFiles_DragDrop;
+
+            filesPanel.Controls.AddRange(new Control[] { lblFilesTitle, listViewFiles });
+
+            // Preview Panel (Right)
+            previewPanel = new ModernPanel
+            {
+                Location = new Point(740, 20),
+                Size = new Size(620, 380),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right | AnchorStyles.Bottom
+            };
+
+            Label lblPreviewTitle = new Label
+            {
+                Text = "👁️ Preview",
+                Location = new Point(15, 15),
+                AutoSize = true,
+                Font = ModernTheme.SubheadingFont,
+                ForeColor = ModernTheme.TextDark
             };
 
             txtPreview = new TextBox
             {
-                Dock = DockStyle.Fill,
+                Location = new Point(15, 50),
+                Size = new Size(590, 315),
                 Multiline = true,
                 ReadOnly = true,
                 ScrollBars = ScrollBars.Both,
-                Font = new Font("Consolas", 9F),
-                BackColor = Color.White,
+                Font = ModernTheme.CodeFont,
                 BorderStyle = BorderStyle.None,
-                WordWrap = false
+                BackColor = Color.FromArgb(250, 250, 250),
+                ForeColor = ModernTheme.TextDark,
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right
             };
 
-            previewPanel.Controls.Add(txtPreview);
-            previewPanel.Controls.Add(lblPreview);
+            previewPanel.Controls.AddRange(new Control[] { lblPreviewTitle, txtPreview });
 
-            mainSplitContainer.Panel1.Controls.Add(leftSplitContainer);
-            mainSplitContainer.Panel2.Controls.Add(previewPanel);
+            // Stats Panel (Bottom Right)
+            statsPanel = new ModernPanel
+            {
+                Location = new Point(740, 420),
+                Size = new Size(620, 200),
+                Anchor = AnchorStyles.Right | AnchorStyles.Bottom,
+                GradientStart = Color.FromArgb(245, 247, 250),
+                GradientEnd = Color.White
+            };
+
+            lblStatsTitle = new Label
+            {
+                Text = "📊 Statistics",
+                Location = new Point(15, 15),
+                AutoSize = true,
+                Font = ModernTheme.SubheadingFont,
+                ForeColor = ModernTheme.TextDark
+            };
+
+            lblTotalFiles = CreateStatsLabel("📄 Total Files: 0", 50);
+            lblTotalSize = CreateStatsLabel("💾 Total Size: 0 B", 85);
+            lblTextFiles = CreateStatsLabel("📝 Text Files: 0", 120);
+            lblBinaryFiles = CreateStatsLabel("🔒 Binary Files: 0", 155);
+
+            statsPanel.Controls.AddRange(new Control[] {
+                lblStatsTitle, lblTotalFiles, lblTotalSize, lblTextFiles, lblBinaryFiles
+            });
+
+            mainContainer.Controls.AddRange(new Control[] { filesPanel, previewPanel, statsPanel });
+
+            // Status Bar
+            statusBar = new Panel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 40,
+                BackColor = ModernTheme.PrimaryColor
+            };
+
+            lblStatus = new Label
+            {
+                Text = "Ready",
+                Location = new Point(20, 10),
+                AutoSize = true,
+                Font = ModernTheme.BodyFont,
+                ForeColor = Color.White
+            };
+
+            progressBar = new ProgressBar
+            {
+                Location = new Point(statusBar.Width - 220, 10),
+                Size = new Size(200, 20),
+                Style = ProgressBarStyle.Continuous,
+                Visible = false,
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
+            };
+
+            statusBar.Controls.AddRange(new Control[] { lblStatus, progressBar });
+            statusBar.Paint += (s, e) =>
+            {
+                e.Graphics.DrawLine(new Pen(ModernTheme.PrimaryDark, 2), 0, 0, statusBar.Width, 0);
+            };
 
             // Add all to form
-            this.Controls.Add(mainSplitContainer);
-            this.Controls.Add(statusStrip);
-            this.Controls.Add(toolStrip);
+            Controls.Add(mainContainer);
+            Controls.Add(statusBar);
+            Controls.Add(actionBar);
+            Controls.Add(topBar);
+
+            // Handle resize for window buttons
+            Resize += (s, e) =>
+            {
+                btnClose.Location = new Point(Width - 50, 10);
+                btnMaximize.Location = new Point(Width - 95, 10);
+                btnMinimize.Location = new Point(Width - 140, 10);
+                progressBar.Location = new Point(Width - 220, 10);
+            };
         }
 
-        private ToolStripButton CreateToolStripButton(string text, string tooltip)
+        private ModernButton CreateWindowButton(string text, Color color)
         {
-            return new ToolStripButton
+            return new ModernButton
             {
                 Text = text,
-                ToolTipText = tooltip,
-                ForeColor = Color.White,
-                DisplayStyle = ToolStripItemDisplayStyle.Text,
-                Font = new Font("Segoe UI", 9F),
-                Padding = new Padding(10, 5, 10, 5)
+                Size = new Size(40, 30),
+                NormalColor = Color.Transparent,
+                HoverColor = color,
+                PressedColor = ModernTheme.Darken(color, 0.2f),
+                BorderColor = Color.Transparent,
+                BorderRadius = 0,
+                ForeColor = ModernTheme.TextDark,
+                Font = new Font("Segoe UI", 16F, FontStyle.Regular)
+            };
+        }
+
+        private ModernButton CreateActionButton(string text, Color color, int x)
+        {
+            return new ModernButton
+            {
+                Text = text,
+                Location = new Point(x, 10),
+                Size = new Size(text.Length > 12 ? 150 : 110, 38),
+                NormalColor = color,
+                HoverColor = ModernTheme.Lighten(color, 0.1f),
+                PressedColor = ModernTheme.Darken(color, 0.1f),
+                BorderColor = ModernTheme.Darken(color, 0.2f),
+                Font = new Font("Segoe UI", 10F, FontStyle.Regular)
             };
         }
 
@@ -267,14 +344,66 @@ namespace FileManagerApp
                 Text = text,
                 Location = new Point(15, top),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = Color.FromArgb(60, 60, 60)
+                Font = ModernTheme.BodyFont,
+                ForeColor = ModernTheme.TextDark
             };
+        }
+
+        private void TopBar_Paint(object? sender, PaintEventArgs e)
+        {
+            // Draw shadow under top bar
+            using (LinearGradientBrush brush = new LinearGradientBrush(
+                new Rectangle(0, topBar.Height - 5, topBar.Width, 5),
+                Color.FromArgb(20, 0, 0, 0),
+                Color.FromArgb(0, 0, 0, 0),
+                LinearGradientMode.Vertical))
+            {
+                e.Graphics.FillRectangle(brush, 0, topBar.Height - 5, topBar.Width, 5);
+            }
+        }
+
+        // Window dragging
+        private bool dragging = false;
+        private Point dragCursorPoint;
+        private Point dragFormPoint;
+
+        private void TopBar_MouseDown(object? sender, MouseEventArgs e)
+        {
+            dragging = true;
+            dragCursorPoint = Cursor.Position;
+            dragFormPoint = Location;
+        }
+
+        private void TopBar_MouseMove(object? sender, MouseEventArgs e)
+        {
+            if (dragging)
+            {
+                Point diff = Point.Subtract(Cursor.Position, new Size(dragCursorPoint));
+                Location = Point.Add(dragFormPoint, new Size(diff));
+            }
+        }
+
+        private void TopBar_MouseUp(object? sender, MouseEventArgs e)
+        {
+            dragging = false;
+        }
+
+        private void ListViewFiles_DragEnter(object? sender, DragEventArgs e)
+        {
+            if (e.Data?.GetDataPresent(DataFormats.FileDrop) == true)
+                e.Effect = DragDropEffects.Copy;
+        }
+
+        private async void ListViewFiles_DragDrop(object? sender, DragEventArgs e)
+        {
+            if (e.Data?.GetData(DataFormats.FileDrop) is string[] files)
+            {
+                await _viewModel.HandleFilesDroppedAsync(files);
+            }
         }
 
         private void SetupDataBindings()
         {
-            // Bind ViewModel properties to UI
             _viewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
 
@@ -303,7 +432,8 @@ namespace FileManagerApp
                     btnClipboard.Enabled = !_viewModel.IsProcessing;
                     break;
                 case nameof(_viewModel.ProgressValue):
-                    progressBar.Value = Math.Min(_viewModel.ProgressValue, progressBar.Maximum);
+                    if (progressBar.Maximum > 0)
+                        progressBar.Value = Math.Min(_viewModel.ProgressValue, progressBar.Maximum);
                     break;
                 case nameof(_viewModel.ProgressMax):
                     progressBar.Maximum = Math.Max(_viewModel.ProgressMax, 1);
@@ -319,21 +449,21 @@ namespace FileManagerApp
 
         private void UpdateFileList()
         {
-            listBoxFiles.Items.Clear();
+            listViewFiles.Clear();
             foreach (var file in _viewModel.FilteredFiles)
             {
-                listBoxFiles.Items.Add(file.FullPath);
+                string icon = ModernTheme.GetFileIcon(file.Extension);
+                listViewFiles.AddItem(file.FileName, file.Directory, icon);
             }
         }
 
         private void UpdateStatistics()
         {
             var stats = _viewModel.Statistics;
-            lblTotalFiles.Text = $"Total Files: {stats.TotalFiles}";
-            lblTotalSize.Text = $"Total Size: {stats.TotalSizeFormatted}";
-            lblTextFiles.Text = $"Text Files: {stats.TextFiles}";
-            lblBinaryFiles.Text = $"Binary Files: {stats.BinaryFiles}";
-            lblStats.Text = stats.GetSummary();
+            lblTotalFiles.Text = $"📄 Total Files: {stats.TotalFiles}";
+            lblTotalSize.Text = $"💾 Total Size: {stats.TotalSizeFormatted}";
+            lblTextFiles.Text = $"📝 Text Files: {stats.TextFiles}";
+            lblBinaryFiles.Text = $"🔒 Binary Files: {stats.BinaryFiles}";
         }
 
         private void SetupEventHandlers()
@@ -347,32 +477,12 @@ namespace FileManagerApp
 
             txtSearch.TextChanged += (s, e) => _viewModel.SearchText = txtSearch.Text;
 
-            listBoxFiles.SelectedIndexChanged += (s, e) =>
+            listViewFiles.SelectedIndexChanged += (s, index) =>
             {
-                if (listBoxFiles.SelectedIndex >= 0 && listBoxFiles.SelectedIndex < _viewModel.FilteredFiles.Count)
+                if (index >= 0 && index < _viewModel.FilteredFiles.Count)
                 {
-                    _viewModel.SelectedFile = _viewModel.FilteredFiles[listBoxFiles.SelectedIndex];
+                    _viewModel.SelectedFile = _viewModel.FilteredFiles[index];
                 }
-            };
-
-            listBoxFiles.DragEnter += (s, e) =>
-            {
-                if (e.Data?.GetDataPresent(DataFormats.FileDrop) == true)
-                    e.Effect = DragDropEffects.Copy;
-            };
-
-            listBoxFiles.DragDrop += async (s, e) =>
-            {
-                if (e.Data?.GetData(DataFormats.FileDrop) is string[] files)
-                {
-                    await _viewModel.HandleFilesDroppedAsync(files);
-                }
-            };
-
-            this.FormClosing += (s, e) =>
-            {
-                // Save window state
-                // Additional cleanup if needed
             };
         }
     }
