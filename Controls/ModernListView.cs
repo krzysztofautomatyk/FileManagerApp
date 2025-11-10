@@ -63,7 +63,6 @@ namespace FileManagerApp.Controls
                      ControlStyles.Selectable, true);
 
             BackColor = Color.White;
-            BorderStyle = BorderStyle.None;
 
             // Setup scrollbar
             vScrollBar = new VScrollBar

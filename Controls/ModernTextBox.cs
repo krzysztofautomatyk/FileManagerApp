@@ -19,7 +19,7 @@ namespace FileManagerApp.Controls
         private int borderRadius = 8;
         private bool isFocused = false;
 
-        public event EventHandler? TextChanged;
+        public new event EventHandler? TextChanged;
 
         public string PlaceholderText
         {
@@ -54,7 +54,7 @@ namespace FileManagerApp.Controls
         public override string Text
         {
             get => textBox.Text;
-            set => textBox.Text = value;
+            set => textBox.Text = value ?? string.Empty;
         }
 
         public ModernTextBox()

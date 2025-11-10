@@ -70,11 +70,11 @@ namespace FileManagerApp.Core
 
         // Fonts
         public static Font TitleFont = new Font("Segoe UI", 16F, FontStyle.Bold);
-        public static Font HeadingFont = new Font("Segoe UI", 14F, FontStyle.Semibold);
-        public static Font SubheadingFont = new Font("Segoe UI", 12F, FontStyle.Semibold);
-        public static Font BodyFont = new Font("Segoe UI", 10F);
-        public static Font SmallFont = new Font("Segoe UI", 9F);
-        public static Font CodeFont = new Font("Consolas", 10F);
+        public static Font HeadingFont = new Font("Segoe UI", 14F, FontStyle.Bold);
+        public static Font SubheadingFont = new Font("Segoe UI", 12F, FontStyle.Bold);
+        public static Font BodyFont = new Font("Segoe UI", 10F, FontStyle.Regular);
+        public static Font SmallFont = new Font("Segoe UI", 9F, FontStyle.Regular);
+        public static Font CodeFont = new Font("Consolas", 10F, FontStyle.Regular);
 
         /// <summary>
         /// Get color by file extension

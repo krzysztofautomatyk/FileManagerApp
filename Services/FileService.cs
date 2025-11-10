@@ -108,7 +108,7 @@ namespace FileManagerApp.Services
                     }
                 }
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
                 _logger.Warning("Access denied: {Path}", dirPath);
             }
