@@ -7,17 +7,19 @@ namespace FileManagerApp.Core
     /// </summary>
     public static class ModernTheme
     {
-        // Primary Colors - Blues
-        public static Color PrimaryColor = Color.FromArgb(52, 152, 219);
-        public static Color PrimaryDark = Color.FromArgb(41, 128, 185);
-        public static Color PrimaryLight = Color.FromArgb(108, 194, 248);
+        // Primary Colors - Professional Blues
+        public static Color PrimaryColor = Color.FromArgb(0, 120, 215);      // Microsoft Blue
+        public static Color PrimaryDark = Color.FromArgb(0, 99, 177);
+        public static Color PrimaryLight = Color.FromArgb(76, 154, 255);
 
-        // Accent Colors
-        public static Color AccentGreen = Color.FromArgb(46, 204, 113);
-        public static Color AccentOrange = Color.FromArgb(230, 126, 34);
-        public static Color AccentRed = Color.FromArgb(231, 76, 60);
-        public static Color AccentPurple = Color.FromArgb(155, 89, 182);
-        public static Color AccentYellow = Color.FromArgb(241, 196, 15);
+        // Accent Colors - Professional Palette
+        public static Color AccentGreen = Color.FromArgb(16, 124, 16);       // Professional Green
+        public static Color AccentOrange = Color.FromArgb(202, 80, 16);      // Professional Orange
+        public static Color AccentRed = Color.FromArgb(196, 43, 28);         // Professional Red
+        public static Color AccentPurple = Color.FromArgb(135, 100, 184);    // Professional Purple
+        public static Color AccentYellow = Color.FromArgb(255, 185, 0);      // Professional Yellow
+        public static Color AccentTeal = Color.FromArgb(0, 183, 195);        // Professional Teal
+        public static Color AccentGray = Color.FromArgb(96, 94, 92);         // Professional Gray
 
         // Neutral Colors
         public static Color BackgroundLight = Color.FromArgb(248, 249, 250);

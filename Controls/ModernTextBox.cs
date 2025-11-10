@@ -148,7 +148,12 @@ namespace FileManagerApp.Controls
         private GraphicsPath GetRoundedRectangle(Rectangle rect, int radius)
         {
             GraphicsPath path = new GraphicsPath();
+
+            // Ensure diameter doesn't exceed rectangle dimensions
             int diameter = radius * 2;
+            if (diameter > rect.Width) diameter = rect.Width;
+            if (diameter > rect.Height) diameter = rect.Height;
+            if (diameter < 1) diameter = 1;
 
             path.AddArc(rect.X, rect.Y, diameter, diameter, 180, 90);
             path.AddArc(rect.Right - diameter, rect.Y, diameter, diameter, 270, 90);

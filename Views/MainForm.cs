@@ -117,7 +117,7 @@ namespace FileManagerApp
             actionBar = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 80,
+                Height = 100,
                 BackColor = Color.White,
                 Padding = new Padding(20, 10, 20, 10)
             };
@@ -128,15 +128,15 @@ namespace FileManagerApp
 
             int buttonX = 20;
             btnAddFile = CreateActionButton("➕ Add Files", ModernTheme.PrimaryColor, buttonX);
-            buttonX += 140;
-            btnAddDir = CreateActionButton("📁 Add Directory", ModernTheme.AccentGreen, buttonX);
             buttonX += 160;
-            btnClear = CreateActionButton("🗑️ Clear", ModernTheme.TextMedium, buttonX);
-            buttonX += 120;
-            btnGenerate = CreateActionButton("💾 Generate", ModernTheme.AccentPurple, buttonX);
-            buttonX += 140;
-            btnClipboard = CreateActionButton("📋 Copy", ModernTheme.AccentOrange, buttonX);
-            buttonX += 120;
+            btnAddDir = CreateActionButton("📁 Add Directory", ModernTheme.AccentGreen, buttonX);
+            buttonX += 180;
+            btnClear = CreateActionButton("🗑️ Clear All", ModernTheme.AccentGray, buttonX);
+            buttonX += 150;
+            btnGenerate = CreateActionButton("💾 Generate File", ModernTheme.AccentPurple, buttonX);
+            buttonX += 180;
+            btnClipboard = CreateActionButton("📋 Copy to Clipboard", ModernTheme.AccentTeal, buttonX);
+            buttonX += 200;
             btnCancel = CreateActionButton("⛔ Cancel", ModernTheme.AccentRed, buttonX);
             btnCancel.Enabled = false;
 
@@ -147,8 +147,8 @@ namespace FileManagerApp
             // Search Box
             txtSearch = new ModernTextBox
             {
-                Location = new Point(20, 45),
-                Width = 400,
+                Location = new Point(20, 58),
+                Width = 500,
                 PlaceholderText = "Search files by name, path, or extension...",
                 Icon = "🔍"
             };
@@ -324,16 +324,20 @@ namespace FileManagerApp
 
         private ModernButton CreateActionButton(string text, Color color, int x)
         {
+            // Calculate width based on text length with better spacing
+            int width = Math.Max(140, text.Length * 10 + 40);
+
             return new ModernButton
             {
                 Text = text,
-                Location = new Point(x, 10),
-                Size = new Size(text.Length > 12 ? 150 : 110, 38),
+                Location = new Point(x, 8),
+                Size = new Size(width, 42),
                 NormalColor = color,
-                HoverColor = ModernTheme.Lighten(color, 0.1f),
-                PressedColor = ModernTheme.Darken(color, 0.1f),
-                BorderColor = ModernTheme.Darken(color, 0.2f),
-                Font = new Font("Segoe UI", 10F, FontStyle.Regular)
+                HoverColor = ModernTheme.Lighten(color, 0.15f),
+                PressedColor = ModernTheme.Darken(color, 0.15f),
+                BorderColor = ModernTheme.Darken(color, 0.1f),
+                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
+                BorderRadius = 6
             };
         }
 
