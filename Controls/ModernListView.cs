@@ -131,7 +131,7 @@ namespace FileManagerApp.Controls
             for (int i = startIndex; i < endIndex; i++)
             {
                 int y = (i * itemHeight) - scrollOffset;
-                Rectangle itemRect = new Rectangle(0, y, Width - (vScrollBar.Visible ? vScrollBar.Width : 0), itemHeight);
+                Rectangle itemRect = new Rectangle(0, y, Width - (vScrollBar?.Visible == true ? vScrollBar.Width : 0), itemHeight);
 
                 DrawItem(g, items[i], itemRect, i);
             }
@@ -246,7 +246,8 @@ namespace FileManagerApp.Controls
             if (newOffset != scrollOffset)
             {
                 scrollOffset = newOffset;
-                vScrollBar.Value = scrollOffset;
+                if (vScrollBar != null)
+                    vScrollBar.Value = scrollOffset;
                 Invalidate();
             }
         }
@@ -265,6 +266,8 @@ namespace FileManagerApp.Controls
 
         private void UpdateScrollBar()
         {
+            if (vScrollBar == null) return;
+
             int contentHeight = items.Count * itemHeight;
             int visibleHeight = Height;
 

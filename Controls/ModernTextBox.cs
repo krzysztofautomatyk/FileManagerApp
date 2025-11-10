@@ -53,8 +53,12 @@ namespace FileManagerApp.Controls
 
         public override string Text
         {
-            get => textBox.Text;
-            set => textBox.Text = value ?? string.Empty;
+            get => textBox?.Text ?? string.Empty;
+            set
+            {
+                if (textBox != null)
+                    textBox.Text = value ?? string.Empty;
+            }
         }
 
         public ModernTextBox()
@@ -86,6 +90,8 @@ namespace FileManagerApp.Controls
 
         private void UpdateTextBoxPadding()
         {
+            if (textBox == null) return;
+
             textBox.Location = new Point(showIcon ? 45 : 15, (Height - textBox.Height) / 2);
             textBox.Width = Width - textBox.Left - 15;
         }
@@ -130,7 +136,7 @@ namespace FileManagerApp.Controls
             }
 
             // Placeholder
-            if (string.IsNullOrEmpty(textBox.Text) && !isFocused)
+            if (textBox != null && string.IsNullOrEmpty(textBox.Text) && !isFocused)
             {
                 using (SolidBrush brush = new SolidBrush(Color.FromArgb(149, 165, 166)))
                 {
